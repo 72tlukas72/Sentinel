@@ -4,7 +4,7 @@
 ===== FORTIGATE SENTINEL =====
 ==============================
 Author: Lukáš Tesař; tlukas.eu
-Version: 1.3
+Version: 1.4
 Description: Script for parsing IP greylist by CZ.NIC to Fortigate format.
 
 https://view.sentinel.turris.cz  
@@ -34,8 +34,16 @@ function getIP()
         ?? '';
 }
 
+// Configure options (IPv4 socket)
+$options  = array("http" => array("user_agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36"), "socket" => array("bindto" => "0:0",),);
+$context  = stream_context_create($options);
+$response = file_get_contents("https://view.sentinel.turris.cz/greylist-data/greylist-latest.csv", false, $context);
+
+// Save Sentinel data locally
+file_put_contents("./greylist-latest.csv", $response);
+
 // Get data from Sentinel
-$sourceData = fopen("https://view.sentinel.turris.cz/greylist-data/greylist-latest.csv", "r");
+$sourceData = fopen("./greylist-latest.csv", "r");
 
 // Read data
 for ($i = 0; $row = fgetcsv($sourceData); $i++) 
